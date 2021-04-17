@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useCallback, useState } from "react";
 import styled from "styled-components";
 import { AppHeader } from "./components/AppHeader";
 import { MovieRow } from "./components/MovieRow";
 import { Container } from "react-bootstrap";
+import { Movie, useMovies } from "./hooks/useMovies";
 
 const StyledApp = styled.div`
   text-align: center;
@@ -15,32 +16,38 @@ const Search = styled.input`
   font-weight: 500;
 `;
 
-interface Movie {
-  id: string;
-  title: string;
-  summary: string;
-}
-
 export const App: React.FunctionComponent = () => {
-  const [rows, setRows] = useState<Movie[]>([
-    { id: "0", title: "Apple", summary: "Lorem ipsum dsfkodeskfosdk." },
-    { id: "1", title: "Orange", summary: "Lorem ipsum dsfkodeskfosdk." },
-    { id: "2", title: "Banana", summary: "Lorem ipsum dsfkodeskfosdk." },
-  ]);
-
+  const [query, setQuery] = useState("");
+  const onSearchChanged = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setQuery(event.target.value);
+    },
+    [setQuery]
+  );
+  const { data: movies, status } = useMovies(query);
   return (
     <StyledApp>
       <AppHeader />
-      <Search placeholder="Enter search term" />
+      <Search
+        placeholder="Enter search term"
+        value={query}
+        onChange={onSearchChanged}
+      />
       <Container fluid>
-        {rows.map((row: any) => (
-          <MovieRow
-            key={row.id}
-            title={row.title}
-            summary={row.summary}
-            image_src=""
-          />
-        ))}
+        {status === "error"
+          ? null //TODO display error state
+          : status === "loading"
+          ? null //TODO display loading state
+          : !!movies
+          ? movies.map((row: Movie) => (
+              <MovieRow
+                key={row.id}
+                title={row.title}
+                summary={row.overview}
+                image_src={row.poster_path || ""}
+              />
+            ))
+          : null}
       </Container>
     </StyledApp>
   );

@@ -1,6 +1,9 @@
 # React Movie Tracker
 Simple ReactJS + Typescript project
 
+## Prerequisites
+Need to set the `REACT_APP_API_KEY` environment variable to provide an API Key for calls to TheMovieDB API
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
